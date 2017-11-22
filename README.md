@@ -3,8 +3,37 @@ Video player for browser that is able to play realtime low latency h264 video st
  Based of [h264-live-player](https://github.com/131/h264-live-player) that uses [Broadway](https://github.com/mbebenita/Broadway) decoder. Ideal for for Raspberry pi cam streaming.
 
 # Usage
- * Server: [example/index.js](example/index.js)
- * Client: [example/html/index.html](example/html/index.html)
+ ## Server:
+ ```js
+ const AvcServer = require('ws-avc-player/server')
+ const WebSocketServer = require('uws').Server
+ const wss = new WebSocketServer({ port: 3333 })
+ const avcServer = new AvcServer(wss, 640, 480)
+
+ avcServer.setVideoStream(h264Stream)
+ ```
+More detailed in [example/index.js](example/index.js) 
+
+## Client: 
+```html
+<html>
+  <body>
+    <!-- define the canvas -->
+    <canvas id='cam' style="width:100%; height:75vw;">
+    <!-- provide WSAvcPlayer -->
+    <script type="text/javascript" src="lib/WSAvcPlayer.js" />
+    <script type="text/javascript">
+      var canvas = document.getElementById('cam')
+      // Create h264 player
+      var wsavc = new WSAvcPlayer(canvas, "webgl", 1, 35);
+
+      wsavc.connect("ws://" + document.location.host+":3333");
+    </script>    
+  </body>
+</html>
+```
+
+More detailed in [example/html/index.html](example/html/index.html)
 
 # Running the demo
 ```

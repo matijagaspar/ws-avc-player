@@ -1,6 +1,6 @@
 {
   "name": "ws-avc-player",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "lib/WSAvcPlayer.js",
   "files": [
     "lib/",
@@ -26,14 +26,16 @@
     "live",
     "broadcast",
     "streaming",
-    "video"
+    "video",
+    "websocket",
+    "raspberry"
   ],
   "author": "Matija Gaspar (http://github.com/matijagaspar)",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/matijagaspar/ws-avc-player/issues"
   },
-  "description": "Video player for browser that is able to play realtime low latency h264 video stream from websocket.\n Based of [h264-live-player](https://github.com/131/h264-live-player) that uses [Broadway](https://github.com/mbebenita/Broadway) Decoder. Meant for Raspberry pi cam",
+  "description": "Video player for browser that is able to play realtime low latency h264 video stream from websocket.\n Based of h264-live-player that uses Broadway Decoder.",
   "dependencies": {
     "debug": "^2.3.2",
     "stream-split": "^1.1.0",
