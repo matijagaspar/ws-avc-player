@@ -1,0 +1,72 @@
+---
+root: true
+extends: eslint:recommended
+parser: babel-eslint
+settings:
+  import/resolver: webpack
+env:
+    es6: true
+    node: false
+    browser: true
+
+parserOptions:
+    sourceType: module
+
+rules:
+    # 2 = errors (bugs)
+    default-case: 2
+    eqeqeq: [ 2, "smart" ]
+    no-eval: 2
+    no-implied-eval: 2
+    no-extend-native: 2
+    no-irregular-whitespace: 2
+    no-obj-calls: 2
+    no-octal: 2
+    no-proto: 2
+    no-redeclare: 2
+    no-return-await: 2
+    no-throw-literal: 2
+    no-undef: 0 # handled by jsx-control-statements/jsx-jcs-no-undef
+    no-use-before-define: [ 2, { functions: false } ]
+    no-var: 2
+    no-with: 2
+    radix: 2
+    space-infix-ops: [ 2, { int32Hint: false } ]
+    space-unary-ops: [ 2, { words: true, nonwords: false } ]
+    use-isnan: 2
+    wrap-iife: [ 2, "outside" ]
+    yoda: 2
+
+    # 1 = warnings (fugly code)
+    array-bracket-spacing: [ 1, "always", { singleValue: true, objectsInArrays: false, arraysInArrays: false } ]
+    arrow-spacing: 1
+    comma-dangle: [ 1, "always-multiline" ]
+    comma-spacing: [ 1, { before: false, after: true } ]
+    func-call-spacing: [ 1, "never" ]
+    func-style: [ 1, "declaration", { allowArrowFunctions: true } ]
+    indent: [ 1, 4, { "SwitchCase": 0 } ]
+    jsx-quotes: [ 1, "prefer-single" ]
+    key-spacing: [ 1, { beforeColon: false, afterColon: true } ]
+    keyword-spacing: 1
+    linebreak-style: [ 1, "unix" ]
+    no-extra-parens: [ 1, "all", { ignoreJSX: "all" } ]
+    no-implicit-coercion: [ 1, { "boolean": false } ]
+    no-multi-spaces: 1
+    no-multiple-empty-lines: [ 1, { "max": 2, "maxEOF": 0 } ]
+    no-trailing-spaces: 1
+    no-unused-vars: [ 1, { argsIgnorePattern: "^_", varsIgnorePattern: "(^log$)|(^_.*)" } ]
+    no-useless-return: 1
+    object-curly-spacing: [ 1, "always" ]
+    prefer-const: 1
+    quotes: [ 1, "single", { avoidEscape: true, allowTemplateLiterals: true }]
+    require-await: 1
+    require-yield: 1
+    rest-spread-spacing: [ 1, "never" ]
+    semi: [ 1 , "never"]
+    space-before-blocks: 1
+    space-before-function-paren: [ 1, "always" ]
+    spaced-comment: [ 1 , "always", { exceptions: ["*"], block: { balanced: true } } ]
+    strict: 0
+    template-curly-spacing: [ 1, "always" ]
+    template-tag-spacing: [ 1, "never" ]
+    no-console: 1

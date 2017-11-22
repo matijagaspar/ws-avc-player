@@ -1,0 +1,58 @@
+{
+  "name": "ws-avc-player",
+  "version": "0.1.0",
+  "main": "lib/WSAvcPlayer.js",
+  "files": [
+    "lib/",
+    "AUTHORS",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "example": "node example/index.js",
+    "build": "cross-env NODE_ENV=production webpack",
+    "build:dev": "webpack",
+    "lint": "eslint .",
+    "lint-fix": "eslint . --fix",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/matijagaspar/ws-avc-player"
+  },
+  "keywords": [
+    "h264",
+    "nal",
+    "live",
+    "broadcast",
+    "streaming",
+    "video"
+  ],
+  "author": "Matija Gaspar (http://github.com/matijagaspar)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matijagaspar/ws-avc-player/issues"
+  },
+  "description": "Video player for browser that is able to play realtime low latency h264 video stream from websocket.\n Based of [h264-live-player](https://github.com/131/h264-live-player) that uses [Broadway](https://github.com/mbebenita/Broadway) Decoder. Meant for Raspberry pi cam",
+  "dependencies": {
+    "debug": "^2.3.2",
+    "stream-split": "^1.1.0",
+    "sylvester.js": "^0.1.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.2",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-1": "^6.24.1",
+    "cross-env": "^5.1.1",
+    "eslint": "^4.11.0",
+    "eslint-import-resolver-webpack": "^0.8.3",
+    "expres": "^0.0.5",
+    "uglifyjs-webpack-plugin": "^1.1.0",
+    "uws": "^9.14.0",
+    "webpack": "^3.8.1",
+    "webpack-bundle-analyzer": "^2.9.1"
+  }
+}
