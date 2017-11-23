@@ -4,10 +4,10 @@ const path = require('path')
 const http = require('http')
 const WebSocketServer = require('uws').Server
 const net = require('net')
-const spawn     = require('child_process').spawn;
+const spawn = require('child_process').spawn
 
 const useRaspivid = process.argv.includes('raspivid')
-const width =  640
+const width = 640
 const height = 480
 
 const express = require('express')
@@ -30,16 +30,18 @@ avcServer.client_events.on('custom_event_from_client', e => {
     // broadcasting custom events to all clients (if you wish to send a event to specific client, handle sockets and new connections yourself)
     avcServer.broadcast('custom_event_from_server', { hello: 'from server' })
 })
-if(useRaspivid){
-    const streamer = spawn('raspivid', ['-pf', 'baseline', '-ih', '-t', '0', '-w', width, '-h', height, '-hf', '-fps', '15', '-g 30', '-o', '-'])
-}else{
-// create the tcp sever that accepts a h264 stream and broadcasts it back to the clients
-this.tcpServer = net.createServer((socket) => {
-    // set video stream
-    avcServer.setVideoStream(socket)
 
-})
-this.tcpServer.listen(5000, '0.0.0.0')
+if (useRaspivid) {
+    const streamer = spawn('raspivid', [ '-pf', 'baseline', '-ih', '-t', '0', '-w', width, '-h', height, '-hf', '-fps', '15', '-g', '30', '-o', '-' ])
+    avcServer.setVideoStream(streamer.stdout)
+} else {
+// create the tcp sever that accepts a h264 stream and broadcasts it back to the clients
+    this.tcpServer = net.createServer((socket) => {
+    // set video stream
+        avcServer.setVideoStream(socket)
+
+    })
+    this.tcpServer.listen(5000, '0.0.0.0')
 }
 
 server.listen(8080)

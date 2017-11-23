@@ -35,7 +35,7 @@
   "bugs": {
     "url": "https://github.com/matijagaspar/ws-avc-player/issues"
   },
-  "description": "Video player for browser that is able to play realtime low latency h264 video stream from websocket.\n Based of h264-live-player that uses Broadway Decoder.",
+  "description": "Stream realtime h264 video directly to the browser. Ideal for raspberry pi. Comes with a browser player, and streaming server.\n Based of h264-live-player that uses Broadway Decoder.",
   "dependencies": {
     "debug": "^2.3.2",
     "stream-split": "^1.1.0",
