@@ -1,5 +1,6 @@
 
-Video player for browser that is able to play realtime low latency h264 video stream from websocket.
+Stream realtime h264 video directly to the browser.
+Comes with a browser player, and streaming server.
  Based of [h264-live-player](https://github.com/131/h264-live-player) that uses [Broadway](https://github.com/mbebenita/Broadway) decoder. Ideal for for Raspberry pi cam streaming.
 
 # Usage
