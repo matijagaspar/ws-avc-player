@@ -39,7 +39,7 @@ More detailed in [example/index.js](example/index.js)
 More detailed in [example/html/index.html](example/html/index.html)
 
 # Running the demo
-```
+```bash
 git clone https://github.com/matijagaspar/ws-avc-player
 cd ws-avc-player
 npm install
@@ -50,13 +50,20 @@ npm run example
 ```
 then run
 
-`ffmpeg -framerate 30 -video_size 640x480 -f [driver] -i [device]  -vcodec libx264 -vprofile baseline -b:v 500k -bufsize 600k -tune zerolatency -pix_fmt yuv420p -r 15 -g 30 -f rawvideo tcp://localhost:5000`
+```bash
+ffmpeg -framerate 30 -video_size 640x480 -f [driver] -i [device]  -vcodec libx264 -vprofile baseline -b:v 500k -bufsize 600k -tune zerolatency -pix_fmt yuv420p -r 15 -g 30 -f rawvideo tcp://localhost:5000
+```
 
 or
+```bash
+raspivid -t 0 -w 640 -h 480 -hf -fps 15 -o - | nc localhost 5000
+```
 
-`raspivid -t 0 -w 640 -h 480 -hf -fps 15 -o - | nc localhost 5000`
-
-to stream 
+alternatively run:
+```bash
+npm run example raspivid
+```
+It will automatically run raspivid too
 
 # TODO:
  * More docs
