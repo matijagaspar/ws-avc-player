@@ -5,6 +5,7 @@ Video player for browser that is able to play realtime low latency h264 video st
 # Usage
 
 ## Server:
+
  ```js
  const AvcServer = require('ws-avc-player/server')
  const WebSocketServer = require('uws').Server
@@ -16,6 +17,7 @@ Video player for browser that is able to play realtime low latency h264 video st
 More detailed in [example/index.js](example/index.js) 
 
 ## Client: 
+
 ```html
 <html>
   <body>

@@ -42,4 +42,4 @@ server.listen(8080)
 // then run ffmpeg: ffmpeg -framerate 30 -video_size 640x480 -f avfoundation -i 0  -vcodec libx264 -vprofile baseline -b:v 500k -bufsize 600k -tune zerolatency -pix_fmt yuv420p -r 15 -g 30 -f rawvideo tcp://localhost:5000
 
 // RPI
-// /opt/vc/bin/raspivid -t 0 -w 640 -h 480 -hf -fps 15 -o - | nc localhost 5000
+// /opt/vc/bin/raspivid -pf baseline -ih -t 0 -w 640 -h 480 -hf -fps 15 -g 30 -o - | nc localhost 5000

@@ -1,6 +1,6 @@
 {
   "name": "ws-avc-player",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "main": "lib/WSAvcPlayer.js",
   "files": [
     "lib/",
