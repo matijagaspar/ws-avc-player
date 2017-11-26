@@ -38,22 +38,32 @@ if (useRaspivid) {
     const startStreamer = () => {
         console.log('starting raspivid')
         streamer = spawn('raspivid', [ '-pf', 'baseline', '-ih', '-t', '0', '-w', width, '-h', height, '-hf', '-fps', '15', '-g', '30', '-o', '-' ])
+        streamer.on('close', () => {
+            streamer = null
+        })
         avcServer.setVideoStream(streamer.stdout)
     }
 
+    // OPTIONAL: start on connect
     avcServer.on('client_connected', () => {
         if (!streamer) {
             startStreamer()
         }
     })
 
+
+    // OPTIONAL: stop on disconnect
     avcServer.on('client_disconnected', () => {
-        if (avcServer.clients < 1 && streamer) {
+        console.log('client disconnected')
+        if (avcServer.clients.size < 1) {
+            if (!streamer) {
+                console.log('raspivid not running')
+                return
+            }
             console.log('stopping raspivid')
             streamer.kill('SIGTERM')
         }
     })
-
 
 } else {
 // create the tcp sever that accepts a h264 stream and broadcasts it back to the clients
