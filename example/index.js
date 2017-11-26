@@ -31,9 +31,30 @@ avcServer.client_events.on('custom_event_from_client', e => {
     avcServer.broadcast('custom_event_from_server', { hello: 'from server' })
 })
 
+// RPI example
 if (useRaspivid) {
-    const streamer = spawn('raspivid', [ '-pf', 'baseline', '-ih', '-t', '0', '-w', width, '-h', height, '-hf', '-fps', '15', '-g', '30', '-o', '-' ])
-    avcServer.setVideoStream(streamer.stdout)
+    let streamer = null
+
+    const startStreamer = () => {
+        console.log('starting raspivid')
+        streamer = spawn('raspivid', [ '-pf', 'baseline', '-ih', '-t', '0', '-w', width, '-h', height, '-hf', '-fps', '15', '-g', '30', '-o', '-' ])
+        avcServer.setVideoStream(streamer.stdout)
+    }
+
+    avcServer.on('client_connected', () => {
+        if (!streamer) {
+            startStreamer()
+        }
+    })
+
+    avcServer.on('client_disconnected', () => {
+        if (avcServer.clients < 1 && streamer) {
+            console.log('stopping raspivid')
+            streamer.kill('SIGTERM')
+        }
+    })
+
+
 } else {
 // create the tcp sever that accepts a h264 stream and broadcasts it back to the clients
     this.tcpServer = net.createServer((socket) => {
