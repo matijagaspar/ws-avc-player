@@ -8,7 +8,7 @@ Comes with a browser player, and streaming server.
 ## Server:
 
  ```js
- const AvcServer = require('ws-avc-player/server')
+ const AvcServer = require('ws-avc-player/lib/server')
  const WebSocketServer = require('uws').Server
  const wss = new WebSocketServer({ port: 3333 })
  const avcServer = new AvcServer(wss, 640, 480)
