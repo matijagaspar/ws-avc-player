@@ -8,9 +8,11 @@
         // only CommonJS-like environments that support module.exports,
         // like Node.
         module.exports = factory();
-    } else {
+    } else if (root) {
         // Browser globals (root is window)
         root.Decoder = factory();
+    } else{
+      factory()
     }
 }(this, function () {
   

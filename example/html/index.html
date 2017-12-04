@@ -7,12 +7,16 @@
     <button type="button" onclick="wsavc.send('custom_event_from_client',{ hello:'world' })">Send event to server</button>
     
     <br/>
+    <p id='frame_buffer'></p>
+    <br/>
     <canvas id='cam' style="width:100%; height:75vw;">
+    
 
   <!-- provide WSAvcPlayer -->
     <script type="text/javascript" src="WSAvcPlayer.js">;</script>
     <script type="text/javascript">
       var canvas = document.getElementById('cam')
+      var fb = document.getElementById('frame_buffer')
 
       // Create h264 player
       var wsavc = new WSAvcPlayer(canvas, "webgl", 1, 35);
@@ -20,6 +24,7 @@
       window.wsavc = wsavc;
       
       //maybe get rid of the ws inside the player?
+      //var uri = "ws://meganeko:3000/videoStream"// + document.location.host;
       var uri = "ws://" + document.location.host;
       //var uri = "ws://localhost:3333/"
       wsavc.connect(uri);
@@ -28,6 +33,9 @@
       
       wsavc.on('disconnected',()=>console.log('WS Disconnected'))
       wsavc.on('connected',()=>console.log('WS connected'))
+      wsavc.on('frame_shift',(fbl)=>{
+       fb.innerText = 'fl: '+fbl
+      })
 
       wsavc.on('initalized',(payload)=>{
         console.log('Initialized', payload)

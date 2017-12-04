@@ -11,12 +11,16 @@ import debug from 'debug' // ?? why?
 
 const log = debug('wsavc')
 class WSAvcPlayer extends EventEmitter {
-    constructor (canvas, canvastype) {
+    constructor (canvas, canvastype, useWorker) {
         super()
         this.canvas = canvas
         this.canvastype = canvastype
+        this.now = new Date().getTime()
         // AVC codec initialization
+        // this.avc = new DecoderAsWorker(canvastype)
+
         this.avc = new Avc()
+
         // TODO: figure out why this was here
         /* if (false) this.avc.configure({
             filter: 'original',
@@ -28,6 +32,10 @@ class WSAvcPlayer extends EventEmitter {
         // WebSocket variable
         this.ws
         this.pktnum = 0
+
+        this.avc.onPictureDecoded = (e, w, h, ...rest) => {
+            return this.initCanvas(w, h, [ e, w, h, ...rest ])
+        }
 
     }
 
@@ -76,6 +84,10 @@ class WSAvcPlayer extends EventEmitter {
             }
         }
         log(`Passed ${ naltype } to decoder ${ data[4] & 0x1f }`)
+        /* const now_new = new Date().getTime()
+        const elapsed = now_new - this.now
+        this.now = now_new
+        console.log(1000 / elapsed) */
         this.avc.decode(data)
     }
 
@@ -118,13 +130,18 @@ class WSAvcPlayer extends EventEmitter {
                 return
 
 
-            if (framesList.length > 10) {
+            if (framesList.length > 30) {
                 log('Dropping frames', framesList.length)
-                framesList = []
+                const vI = framesList.findIndex(e => (e[4] & 0x1f) === 7)
+                // console.log('Dropping frames', framesList.length, vI)
+                if (vI >= 0) {
+                    framesList = framesList.slice(vI)
+                }
+                // framesList = []
             }
 
             const frame = framesList.shift()
-
+            this.emit('frame_shift', framesList.length)
 
             if (frame)
                 this.decode(frame)
@@ -145,16 +162,26 @@ class WSAvcPlayer extends EventEmitter {
         return this.ws
     }
 
-    initCanvas (width, height) {
+    initCanvas (width, height, dec) {
         const canvasFactory = this.canvastype === 'webgl' || this.canvastype === 'YUVWebGLCanvas'
             ? YUVWebGLCanvas
             : YUVCanvas
 
         const canvas = new canvasFactory(this.canvas, new Size(width, height))
-        this.avc.onPictureDecoded = canvas.decode
-
+        this.avc.onPictureDecoded = (e, w, h, ...rest) => {
+            // console.log(rest)
+            if (w !== width || h !== height) {
+                return this.initCanvas(w, h, [ e, w, h, ...rest ])
+            }
+            return canvas.decode(e, w, h, ...rest)
+        }
+        this.canvas.style = `width:100%; height:${ height / width * 100 }vh;`
         this.canvas.width = width
         this.canvas.height = height
+
+        if (dec) {
+            return canvas.decode(...dec)
+        }
 
 
     }
@@ -164,7 +191,7 @@ class WSAvcPlayer extends EventEmitter {
         switch (cmd.action) {
         case 'initalize': {
             const { width, height } = cmd.payload
-            this.initCanvas(width, height)
+            // this.initCanvas(width, height)
             return this.emit('initalized', cmd.payload)
 
         }

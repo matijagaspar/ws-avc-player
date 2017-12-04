@@ -7,8 +7,8 @@ const net = require('net')
 const spawn = require('child_process').spawn
 
 const useRaspivid = process.argv.includes('raspivid')
-const width = 640
-const height = 480
+const width = 1280
+const height = 720
 
 const express = require('express')
 const app = express()
@@ -86,6 +86,9 @@ server.listen(8080)
 // ffmpeg -framerate 25 -video_size 640x480 -f dshow -i "video=<DEVICE>"  -vcodec libx264 -vprofile baseline -b:v 500k -bufsize 600k -tune zerolatency -pix_fmt yuv420p -f rawvideo tcp://localhost:5000
 // to get video devices run:
 // ffmpeg -list_devices true -f dshow -i dummy
+
+
+// ffmpeg -framerate 25 -video_size 1280x720 -f dshow -i "video=Logitech HD Webcam C270"  -vcodec libx264 -vprofile baseline -b:v 500k -bufsize 600k -tune zerolatency -pix_fmt yuv420p -f rawvideo tcp://localhost:5000
 
 // RPI
 // /opt/vc/bin/raspivid -pf baseline -ih -t 0 -w 640 -h 480 -hf -fps 15 -g 30 -o - | nc localhost 5000
