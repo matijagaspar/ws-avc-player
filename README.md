@@ -67,6 +67,7 @@ npm run example raspivid
 It will automatically run raspivid too
 
 # TODO:
+ * Decoder as worker
  * More docs
  * More cleanup
  * Audio
