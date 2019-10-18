@@ -1,11 +1,13 @@
-
 // TODO: finish one day..
 class DecoderAsWorker {
     constructor (canvastype) {
         const webgl = canvastype === 'webgl'
         const raw_decode = require('raw-loader!broadway/Decoder')
-        const smth = window.URL.createObjectURL( new Blob([ raw_decode ]))
-        const worker = new Worker(smth)// '/Decoder.js')
+        const blob = new Blob([ raw_decode ], { type: 'application/javascript' })
+
+        // const smth = window.URL.createObjectURL( new Blob([ raw_decode ]))
+        const worker = new Worker(URL.createObjectURL(blob))
+        // const worker = new Worker(smth)// '/Decoder.js')
         const reuseMemory = true
         const transferMemory = true
 
@@ -57,3 +59,4 @@ class DecoderAsWorker {
         }
     }
 }
+export default DecoderAsWorker

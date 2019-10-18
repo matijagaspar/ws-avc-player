@@ -201,7 +201,7 @@ export default class WebGLCanvas {
 
     onInitWebGL () {
         try {
-            this.gl = this.canvas.getContext('experimental-webgl')
+            this.gl = this.canvas.getContext('webgl')
         } catch (e) {
             console.warn('failed to initGL', e)
         }
@@ -265,7 +265,7 @@ function resize (canvas) {
     // eslint-disable-next-line eqeqeq
       canvas.height != displayHeight) {
 
-    // Make the canvas the same size
+        // Make the canvas the same size
         canvas.width = displayWidth
         canvas.height = displayHeight
     }

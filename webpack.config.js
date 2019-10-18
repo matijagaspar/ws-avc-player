@@ -1,11 +1,12 @@
 const path = require('path')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const isProduction = process.env.NODE_ENV === 'production'
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const webpackConfig = {
     entry: {
         WSAvcPlayer: path.resolve(__dirname, 'player/WSAvcPlayer.js'),
     },
     output: {
-        // options related to how webpack emits results
+    // options related to how webpack emits results
 
         path: path.resolve(__dirname, 'lib'), // string
         // the target directory for all output files
@@ -19,20 +20,26 @@ const webpackConfig = {
         rules: [
             {
                 test: /\.js$/,
-                loader: 'babel-loader',
                 // the loader which should be applied, it'll be resolved relative to the context
                 // -loader suffix is no longer optional in webpack2 for clarity reasons
                 // see webpack 1 upgrade guide
-
-                options: {
-                    presets: [
-                        'stage-1',
-                        [ 'env', {
-                            'targets': {
-                                'browsers': [ '>= 5%' ],
-                            },
-                        }],
-                    ],
+                exclude: /node_modules|Decoder\.js/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            [
+                                '@babel/preset-env',
+                                {
+                                    useBuiltIns: 'usage',
+                                    targets: '> 0.25%, not dead',
+                                    corejs: '3',
+                                    modules: false,
+                                },
+                            ],
+                        ],
+                        plugins: [ '@babel/plugin-proposal-class-properties' ],
+                    },
                 },
             },
         ],
@@ -43,10 +50,11 @@ const webpackConfig = {
     node: {
         fs: 'empty',
     },
-    plugins: [],
-
+    optimization: {
+        minimize: isProduction,
+        usedExports: isProduction,
+    },
+    mode: isProduction ? 'production' : 'development',
 }
-if (process.env.NODE_ENV === 'production')
-    webpackConfig.plugins.push(new UglifyJsPlugin())
 
 module.exports = webpackConfig

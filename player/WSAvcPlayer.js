@@ -1,12 +1,13 @@
 'use strict'
 
-import Avc from 'broadway/Decoder'
+// import Avc from 'broadway/Decoder'
 import YUVWebGLCanvas from 'canvas/YUVWebGLCanvas'
 import YUVCanvas from 'canvas/YUVCanvas'
 import Size from 'utils/Size'
-import { EventEmitter } from 'events'
-
-import debug from 'debug' // ?? why?
+// import DecoderAsWorker from './DecoderAsWorker'
+const Avc = require('broadway/Decoder')
+const { EventEmitter } = require('events')
+const debug = require('debug')
 
 
 const log = debug('wsavc')
@@ -32,8 +33,8 @@ class WSAvcPlayer extends EventEmitter {
         // WebSocket variable
         this.ws
         this.pktnum = 0
-
         this.avc.onPictureDecoded = (e, w, h, ...rest) => {
+            this.emit('resized', { width: w, height: h })
             return this.initCanvas(w, h, [ e, w, h, ...rest ])
         }
 
@@ -163,6 +164,7 @@ class WSAvcPlayer extends EventEmitter {
     }
 
     initCanvas (width, height, dec) {
+        // console.log(this.canvastype)
         const canvasFactory = this.canvastype === 'webgl' || this.canvastype === 'YUVWebGLCanvas'
             ? YUVWebGLCanvas
             : YUVCanvas
@@ -171,13 +173,14 @@ class WSAvcPlayer extends EventEmitter {
         this.avc.onPictureDecoded = (e, w, h, ...rest) => {
             // console.log(rest)
             if (w !== width || h !== height) {
+                this.emit('resized', { width: w, height: h })
                 return this.initCanvas(w, h, [ e, w, h, ...rest ])
             }
             return canvas.decode(e, w, h, ...rest)
         }
-        this.canvas.style = `width:100%; height:${ height / width * 100 }vh;`
-        this.canvas.width = width
-        this.canvas.height = height
+        // this.canvas.style = `width:100%; height:${ height / width * 100 }vh;`
+        // this.canvas.width = width
+        // this.canvas.height = height
 
         if (dec) {
             return canvas.decode(...dec)
@@ -209,6 +212,7 @@ class WSAvcPlayer extends EventEmitter {
         return this.ws.send(JSON.stringify({ action, payload }))
     }
 }
+export default WSAvcPlayer
 
-module.exports = WSAvcPlayer
-module.exports.debug = debug
+// module.exports = WSAvcPlayer
+// module.exports.debug = debug
