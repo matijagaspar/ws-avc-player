@@ -1,28 +1,12 @@
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const BroadwayDir = path.resolve(__dirname, 'Broadway/Player')
 // const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const webpackConfig = {
     entry: {
         WSAvcPlayer: path.resolve(__dirname, 'player/WSAvcPlayer.js'),
     },
-    // externals: {
-    //     'Broadway/Player': {
-    //         'commonjs': [ 'Player', 'Player' ],
-    //         'commonjs2': 'Player',
-    //         root: 'Player',
-    //         amd: 'Player',
-    //     },
-    //     'Broadway/Decoder': {
-    //         'commonjs': 'Decoder',
-    //         'commonjs2': 'Decoder',
-    //     },
-    //     'Broadway/YUVCanvas': {
-    //         'commonjs': 'YUVCanvas',
-    //         'commonjs2': 'YUVCanvas',
-    //     },
-
-    // },
     output: {
     // options related to how webpack emits results
 
@@ -103,6 +87,9 @@ const webpackConfig = {
 
     resolve: {
         modules: [ path.resolve(__dirname, 'player'), 'node_modules' ],
+        alias: {
+            Broadway: BroadwayDir,
+        },
     },
     node: {
         fs: 'empty',
@@ -115,12 +102,12 @@ const webpackConfig = {
     plugins: [
         new CopyWebpackPlugin([
             {
-                from: 'player/Broadway/Decoder.js', // Will resolve to RepoDir/src/assets
-                to: './', // Copies all files from above dest to dist/assets
+                from: path.resolve(BroadwayDir, 'Decoder.js'),
+                to: './',
             },
             {
-                from: 'player/Broadway/avc.wasm', // Will resolve to RepoDir/src/assets
-                to: './', // Copies all files from above dest to dist/assets
+                from: path.resolve(BroadwayDir, 'avc.wasm'),
+                to: './',
             },
         ]),
     ],

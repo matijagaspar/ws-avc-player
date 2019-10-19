@@ -67,11 +67,12 @@ npm run example raspivid
 It will automatically run raspivid too
 
 # TODO:
- * Decoder as worker
+ * ~Decoder as worker~
  * More docs
  * More cleanup
  * Audio
  * ~Ability to change video resolution or better parse sps/pps~
+ * ~Decent performance~
  
 # Credits
 * [matijagaspar](https://github.com/matijagaspar)

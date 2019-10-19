@@ -1,13 +1,8 @@
 'use strict'
 
-// import Avc from 'broadway/Decoder'
-
-// import Size from 'utils/Size'
-// import DecoderAsWorker from './DecoderAsWorker'
 const Player = require('Broadway/Player')
 const { EventEmitter } = require('events')
 const debug = require('debug')
-
 
 const log = debug('wsavc')
 class WSAvcPlayer extends EventEmitter {
@@ -26,21 +21,14 @@ class WSAvcPlayer extends EventEmitter {
                 height: 368,
             },
         })
-        // this.AvcPlayer.canvas
         this.width = 1280
         this.height = 1024
-        this.AvcPlayer.onPictureDecoded = (_, w, h, i) => {
-            // console.log('pic decoded', i)
+        this.AvcPlayer.onPictureDecoded = (_, w, h) => {
             if (w !== this.width || h !== this.height) {
                 this.emit('resized', { width: w, height: h })
                 this.width = w
                 this.height = h
             }
-            // if (this.running) {
-            //     clearTimeout(this.shiftFrameTimeout)
-            //     this.shiftFrameTimeout = null
-            //     this.shiftFrameTimeout = setTimeout(this.shiftFrame, 1)
-            // }
         }
 
         this.ws
@@ -48,12 +36,6 @@ class WSAvcPlayer extends EventEmitter {
         this.framesList = []
         this.running = false
         this.shiftFrameTimeout = null
-        this.AvcPlayer.onRenderFrameComplete = (...s) => {
-            // console.log('render frame complete', s)
-            // if (this.framesList.length > 0) {
-
-        }
-        // onPictureDecoded
     }
 
     shiftFrame = () => {
