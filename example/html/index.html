@@ -50,13 +50,17 @@
     
 
   <!-- provide WSAvcPlayer -->
+  <!-- <script type="text/javascript" src="Decoder.js"></script>
+  <script type="text/javascript" src="YUVCanvas.js"></script>
+  <script type="text/javascript" src="Player.js"></script> -->
     <script type="text/javascript" src="WSAvcPlayer.js">;</script>
+    
     <script type="text/javascript">
       var canvas = document.getElementById('cam')
       var fb = document.getElementById('frame_buffer')
-
       // Create h264 player
-      var wsavc = new WSAvcPlayer.default(canvas, "webgl", 1, 35);
+      var wsavc = new WSAvcPlayer.default({useWorker:true});
+      document.getElementById('video-box').appendChild(wsavc.AvcPlayer.canvas)
       //expose instance for button callbacks
       window.wsavc = wsavc;
       
