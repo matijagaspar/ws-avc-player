@@ -6,6 +6,7 @@ const BroadwayDir = path.resolve(__dirname, 'Broadway/Player')
 const webpackConfig = {
     entry: {
         WSAvcPlayer: path.resolve(__dirname, 'player/WSAvcPlayer.js'),
+        Decoder: path.resolve(BroadwayDir, 'Decoder.js'),
     },
     output: {
     // options related to how webpack emits results
@@ -17,6 +18,7 @@ const webpackConfig = {
         library: '[name]',
         libraryTarget: 'umd',
         umdNamedDefine: true,
+        globalObject: 'this',
     },
     module: {
         rules: [
@@ -44,21 +46,15 @@ const webpackConfig = {
                     },
                 },
             },
+            // npm install url-loader --save-dev
 
-            // {
-            //     test: /Decoder\.js$/,
-            //     loader: 'string-replace-loader',
-            //     options: {
-            //         search: 'wasmBinaryFile="avc.wasm"',
-            //         replace: 'wasmBinaryFile=require(\'Broadway/avc.wasm\')',
-            //     },
-            // },
+
             // {
             //     test: /Player\.js$/,
             //     loader: 'string-replace-loader',
             //     options: {
             //         search: 'this._config.workerFile = this._config.workerFile || "Decoder.js";',
-            //         replace: 'this._config.workerFile = this._config.workerFile || require(\'Broadway/Decoder.js\')',
+            //         replace: 'this._config.workerFile = this._config.workerFile || require(\'url-loader!Broadway/Decoder.js\')',
             //     },
             // },
             // {
@@ -70,18 +66,28 @@ const webpackConfig = {
             //         },
             //     ],
             // },
-            // {
-            //     test: /\.wasm$/i,
-            //     type: 'javascript/auto',
-            //     use: [
-            //         {
-            //             loader: 'file-loader',
-            //             options: {
-            //                 name: '[name].[contenthash].[ext]',
-            //             },
-            //         },
-            //     ],
-            // },
+            {
+                test: /\.wasm$/i,
+                type: 'javascript/auto',
+                use: [
+                    {
+                        loader: 'url-loader',
+                        options: {
+                            // limit: false,
+                            // name: '[name].[ext]',
+                        },
+                    },
+                ],
+            },
+            {
+                test: /Decoder\.js$/,
+                loader: 'string-replace-loader',
+                options: {
+                    search: 'wasmBinaryFile="avc.wasm"',
+                    replace: 'wasmBinaryFile=require(\'Broadway/avc.wasm\')',
+                },
+            },
+
         ],
     },
 
@@ -98,17 +104,21 @@ const webpackConfig = {
         minimize: isProduction,
         usedExports: isProduction,
     },
+    performance: {
+        maxAssetSize: 500000,
+        maxEntrypointSize: 500000,
+    },
     mode: isProduction ? 'production' : 'development',
     plugins: [
         new CopyWebpackPlugin([
-            {
-                from: path.resolve(BroadwayDir, 'Decoder.js'),
-                to: './',
-            },
-            {
-                from: path.resolve(BroadwayDir, 'avc.wasm'),
-                to: './',
-            },
+            // {
+            //     from: path.resolve(BroadwayDir, 'Decoder.js'),
+            //     to: './',
+            // },
+            // {
+            //     from: path.resolve(BroadwayDir, 'avc.wasm'),
+            //     to: './',
+            // },
         ]),
     ],
 }

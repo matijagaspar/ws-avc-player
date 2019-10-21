@@ -66,6 +66,24 @@ npm run example raspivid
 ```
 It will automatically run raspivid too
 
+## Using it in your own project
+
+`yarn add ws-avc-player`
+
+### On Client
+* `import WSAvcPlayer from 'ws-avc-player'`
+* ``` 
+        const wsavc = new WSAvcPlayer({useWorker:true})
+        wsavc.connect(serverUrl);
+
+  ```
+###  On Server:
+
+* See `example/index.js`
+
+
+
+
 # TODO:
  * ~Decoder as worker~
  * More docs
