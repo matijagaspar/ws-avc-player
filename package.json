@@ -1,6 +1,6 @@
 {
   "name": "ws-avc-player",
-  "version": "0.1.9",
+  "version": "1.0.0",
   "main": "lib/WSAvcPlayer.js",
   "files": [
     "lib/",
@@ -37,26 +37,31 @@
   },
   "description": "Stream realtime h264 video directly to the browser. Ideal for raspberry pi. Comes with a browser player, and streaming server.\n Based of h264-live-player that uses Broadway Decoder.",
   "dependencies": {
-    "debug": "^2.3.2",
+    "debug": "^4.1.1",
     "stream-split": "^1.1.0",
+    "string-replace-loader": "^2.2.0",
     "sylvester.js": "^0.1.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.0.2",
-    "babel-loader": "^7.1.2",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-stage-1": "^6.24.1",
-    "cross-env": "^5.1.1",
-    "eslint": "^4.11.0",
-    "eslint-import-resolver-webpack": "^0.8.3",
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-stage-1": "^7.0.0",
+    "@clusterws/cws": "^0.15.2",
+    "babel-eslint": "^10.0.3",
+    "babel-loader": "^8.0.6",
+    "conventional-changelog-cli": "^2.0.25",
+    "copy-webpack-plugin": "^5.0.4",
+    "core-js": "3",
+    "cross-env": "^6.0.3",
+    "eslint": "^6.5.1",
+    "eslint-import-resolver-webpack": "^0.11.1",
     "expres": "^0.0.5",
-    "file-loader": "^1.1.5",
-    "raw-loader": "^0.5.1",
-    "uglifyjs-webpack-plugin": "^1.1.0",
-    "uws": "^9.14.0",
-    "webpack": "^3.8.1",
-    "webpack-bundle-analyzer": "^2.9.1"
+    "file-loader": "^4.2.0",
+    "raw-loader": "^3.1.0",
+    "url-loader": "^2.2.0",
+    "webpack": "^4.41.2",
+    "webpack-bundle-analyzer": "^3.6.0",
+    "webpack-cli": "^3.3.9"
   }
 }

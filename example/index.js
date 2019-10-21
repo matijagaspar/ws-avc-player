@@ -2,7 +2,9 @@
 const AvcServer = require('../lib/server')
 const path = require('path')
 const http = require('http')
-const WebSocketServer = require('uws').Server
+// const WebSocketServer = require('uws').Server
+const { WebSocketServer } = require('@clusterws/cws')
+// require('uWebSockets.js')
 const net = require('net')
 const spawn = require('child_process').spawn
 
@@ -69,13 +71,16 @@ if (useRaspivid) {
 // create the tcp sever that accepts a h264 stream and broadcasts it back to the clients
     this.tcpServer = net.createServer((socket) => {
     // set video stream
+        socket.on('error', e => {
+            console.log('video downstream error:', e)
+        })
         avcServer.setVideoStream(socket)
 
     })
     this.tcpServer.listen(5000, '0.0.0.0')
 }
 
-server.listen(8080)
+server.listen(8081)
 
 // if not using raspivid option than use one of this to stream
 // ffmpeg OSX
@@ -84,11 +89,18 @@ server.listen(8080)
 // fmpeg Windows:
 
 // ffmpeg -framerate 25 -video_size 640x480 -f dshow -i "video=<DEVICE>"  -vcodec libx264 -vprofile baseline -b:v 500k -bufsize 600k -tune zerolatency -pix_fmt yuv420p -f rawvideo tcp://localhost:5000
+
 // to get video devices run:
 // ffmpeg -list_devices true -f dshow -i dummy
 
+// To get options of the device: 
+// ffmpeg -f dshow -list_options true -i video="<Device>"
+
+
+// examples:
+// ffmpeg -framerate 25 -video_size 640x480 -f dshow -i video="HD Camera"  -vcodec libx264 -vprofile baseline -b:v 500k -bufsize 600k -tune zerolatency -pix_fmt yuv420p -f rawvideo tcp://localhost:5000
 
 // ffmpeg -framerate 25 -video_size 1280x720 -f dshow -i "video=Logitech HD Webcam C270"  -vcodec libx264 -vprofile baseline -b:v 500k -bufsize 600k -tune zerolatency -pix_fmt yuv420p -f rawvideo tcp://localhost:5000
-
+// ffmpeg.exe -framerate 30 -video_size 1280x720 -f dshow -i video="HD Camera"  -vcodec libx264 -vprofile baseline -b:v 2m -bufsize 2m -pass 1 -coder 0 -bf 0 -flags -loop -tune zerolatency -pix_fmt yuv420p -wpredp 0 -f rawvideo tcp://localhost:5000
 // RPI
 // /opt/vc/bin/raspivid -pf baseline -ih -t 0 -w 640 -h 480 -hf -fps 15 -g 30 -o - | nc localhost 5000
