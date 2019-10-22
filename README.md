@@ -9,9 +9,9 @@ Comes with a browser player, and streaming server.
 
  ```js
  const AvcServer = require('ws-avc-player/lib/server')
- const WebSocketServer = require('uws').Server
+ const { WebSocketServer } = require('@clusterws/cws') // works with ws, legacy uws
  const wss = new WebSocketServer({ port: 3333 })
- const avcServer = new AvcServer(wss, 640, 480)
+ const avcServer = new AvcServer(wss, 640, 480) //initial width and height (it adapts to the stream)
 
  avcServer.setVideoStream(h264Stream)
  ```
@@ -22,15 +22,16 @@ More detailed in [example/index.js](example/index.js)
 ```html
 <html>
   <body>
-    <!-- define the canvas -->
-    <canvas id='cam' style="width:100%; height:75vw;">
+    <!-- define the element to hold the canvas -->
+     <div id="video-box" />
     <!-- provide WSAvcPlayer -->
-    <script type="text/javascript" src="lib/WSAvcPlayer.js" />
+    <script type="text/javascript" src="WSAvcPlayer.js" />
     <script type="text/javascript">
-      var canvas = document.getElementById('cam')
-      // Create h264 player
-      var wsavc = new WSAvcPlayer(canvas, "webgl", 1, 35);
-
+      //initialize the player, if useWorker: true, than you must have `/Decoder.js` availible at the root of the domain.
+      var wsavc = new WSAvcPlayer.default({useWorker:false}); 
+      //append the canvas to the box element, you can style the box element and canvas.
+      document.getElementById('video-box').appendChild(wsavc.AvcPlayer.canvas)
+      //connect to the websocket
       wsavc.connect("ws://" + document.location.host+":3333");
     </script>    
   </body>
