@@ -1,3 +1,4 @@
 /node_modules/*
 /player/broadway/Decoder.js
 /lib/WSAvcPlayer.js
+/Broadway/*

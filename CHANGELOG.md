@@ -1,3 +1,6 @@
+## 2.0.2 (2019-10-21)
+* Update readme example
+
 ## 2.0.1 (2019-10-21)
 * small readme update
 
