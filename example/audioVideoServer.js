@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 const AvcServer = require('../lib/avcServer')
+const AudioServer = require('../lib/audioServer')
+
 const path = require('path')
 const http = require('http')
 // const WebSocketServer = require('uws').Server
@@ -8,7 +10,8 @@ const { WebSocketServer } = require('@clusterws/cws')
 const net = require('net')
 const spawn = require('child_process').spawn
 
-const useRaspivid = process.argv.includes('raspivid')
+const rasp = process.argv.includes('rasp')
+const win = process.argv.includes('win')
 const width = 1280
 const height = 720
 
@@ -21,20 +24,22 @@ app.use(express.static(path.resolve(__dirname, '../lib')))
 
 const server = http.createServer(app)
 
-// init web socket
-const wss = new WebSocketServer({ /* port: 3333 */ server, path: 'video' })
-// init the avc server.
-const avcServer = new AvcServer(wss, width, height)
+// init video web socket
+const wssVideo = new WebSocketServer({ /* port: 3333 */ server, path: 'video' })
+// init audio web socket
+const wssAudio = new WebSocketServer({ /* port: 3333 */ server, path: '/audio' })
 
-// handling custom events from client
-avcServer.client_events.on('custom_event_from_client', e => {
-    console.log('a client sent', e)
-    // broadcasting custom events to all clients (if you wish to send a event to specific client, handle sockets and new connections yourself)
-    avcServer.broadcast('custom_event_from_server', { hello: 'from server' })
-})
+// init the avc server.
+const avcServer = new AvcServer(wssVideo, width, height)
+
+// init audio server
+const samplingRate = 48000
+const channels = 1
+const frameDuration = 20
+const audioServer = new AudioServer(wssAudio, samplingRate, frameDuration, channels)
 
 // RPI example
-if (useRaspivid) {
+if (rasp) {
     let streamer = null
 
     const startStreamer = () => {
@@ -67,6 +72,105 @@ if (useRaspivid) {
         }
     })
 
+    // TODO: RPI audio Example
+
+} else if (win) {
+    let videoStreamer = null
+    // server
+    const startStreamer = () => {
+
+        // prep video
+        console.log('starting ffmpet')
+
+        videoStreamer = spawn('ffmpeg', [
+            '-framerate',
+            '30',
+            '-video_size',
+            '640x480',
+            '-f',
+            'dshow',
+            '-i',
+            'video=HD Camera',
+            '-vcodec',
+            'libx264',
+            '-vprofile',
+            'baseline',
+            '-b:v',
+            '500k',
+            '-bufsize',
+            '600k',
+            '-tune',
+            'zerolatency',
+            '-pix_fmt',
+            'yuv420p',
+            '-f',
+            'rawvideo',
+            '-',
+        ])
+        videoStreamer.on('close', () => {
+            videoStreamer = null
+        })
+        avcServer.setVideoStream(videoStreamer.stdout)
+    }
+
+    // OPTIONAL: start on connect
+    avcServer.on('client_connected', () => {
+        if (!videoStreamer) {
+            startStreamer()
+        }
+    })
+
+
+    // OPTIONAL: stop on disconnect
+    avcServer.on('client_disconnected', () => {
+        console.log('client disconnected')
+        if (avcServer.clients.size < 1) {
+            if (!videoStreamer) {
+                console.log('ffmpeg not running')
+                return
+            }
+            console.log('stopping raspivid')
+            videoStreamer.kill('SIGTERM')
+        }
+    })
+
+
+    // audio
+    let audioStreamer = null
+
+    const startAudioStreamer = () => {
+        audioStreamer = spawn('sox', [ '-c', channels.toString(), '-r', samplingRate.toString(), '-t', 'waveaudio', '0', '--buffer', '960', '-p' ])
+        console.log('started sox')
+        audioStreamer.stderr.on('data', d => console.log(d.toString()))
+        audioStreamer.on('close', () => {
+            audioStreamer = null
+        })
+        audioServer.setAudioStream(audioStreamer.stdout)
+    }
+
+    // OPTIONAL: start on connect
+    audioServer.on('client_connected', () => {
+        console.log('client_conneted')
+        if (!audioStreamer) {
+            startAudioStreamer()
+        }
+    })
+
+
+    // OPTIONAL: stop on disconnect
+    audioServer.on('client_disconnected', () => {
+        console.log('client disconnected')
+        if (audioServer.clients.size < 1) {
+            if (!audioStreamer) {
+                console.log('sox not running')
+                return
+            }
+            console.log('stopping sox')
+            audioStreamer.kill('SIGTERM')
+        }
+    })
+
+
 } else {
 // create the tcp sever that accepts a h264 stream and broadcasts it back to the clients
     this.tcpServer = net.createServer((socket) => {
@@ -78,6 +182,16 @@ if (useRaspivid) {
 
     })
     this.tcpServer.listen(5000, '0.0.0.0')
+
+    this.tcpServer = net.createServer((socket) => {
+        // set video stream
+        socket.on('error', e => {
+            console.log('video downstream error:', e)
+        })
+        audioServer.setVideoStream(socket)
+
+    })
+    this.tcpServer.listen(5001, '0.0.0.0')
 }
 
 server.listen(8081)

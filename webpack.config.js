@@ -6,6 +6,8 @@ const BroadwayDir = path.resolve(__dirname, 'Broadway/Player')
 const webpackConfig = {
     entry: {
         WSAvcPlayer: path.resolve(__dirname, 'player/WSAvcPlayer.js'),
+        WSAudioPlayer: path.resolve(__dirname, 'player/WSAudioPlayer.js'),
+        OpusDecoder: path.resolve(__dirname, 'player/OpusDecoder.js'),
         Decoder: path.resolve(BroadwayDir, 'Decoder.js'),
     },
     output: {
@@ -21,6 +23,10 @@ const webpackConfig = {
         globalObject: 'this',
     },
     module: {
+        defaultRules: [{
+            type: 'javascript/auto',
+            resolve: {},
+        }],
         rules: [
             {
                 test: /\.js$/,
@@ -79,6 +85,17 @@ const webpackConfig = {
                     },
                 ],
             },
+
+            {
+                //skip nasm to keep the bundle size smaller
+                test: path.resolve(__dirname, 'node_modules/opusscript/build/opusscript_native_nasm.js'),
+                use: 'null-loader',
+            },
+            // {
+            //     //fix broken globals....
+            //     test: /node_modules\/opusscript\/index\.js$/,
+            //     loader: 'exports-loader',
+            // },
             {
                 test: /Decoder\.js$/,
                 loader: 'string-replace-loader',
@@ -87,6 +104,22 @@ const webpackConfig = {
                     replace: 'wasmBinaryFile=require(\'Broadway/avc.wasm\')',
                 },
             },
+            // {
+            //     test: /opusscript_native_wasm\.js$/,
+            //     loader: 'string-replace-loader',
+            //     options: {
+            //         search: 'wasmBinaryFile="opusscript_native_wasm.wasm"',
+            //         replace: 'wasmBinaryFile=require(\'opusscript/build/opusscript_native_wasm.wasm\')',
+            //     },
+            // },
+            {
+                test: path.resolve(__dirname, 'node_modules/opusscript/index.js'),
+                loader: 'string-replace-loader',
+                options: {
+                    search: 'opusscript_native_wasm = require("./build/opusscript_native_wasm.js")();',
+                    replace: `opusscript_native_wasm = require('./build/opusscript_native_wasm.js')({locateFile (path) { if (path.endsWith('.wasm')) { return require('opusscript/build/opusscript_native_wasm.wasm') } return path }});`
+                },
+            }
 
         ],
     },
@@ -111,6 +144,9 @@ const webpackConfig = {
     mode: isProduction ? 'production' : 'development',
     plugins: [
         new CopyWebpackPlugin([
+            // {
+            //     from: path.resolve(__dirname, 'node_modules/opusscript')
+            // }
             // {
             //     from: path.resolve(BroadwayDir, 'Decoder.js'),
             //     to: './',

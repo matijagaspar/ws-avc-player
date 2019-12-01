@@ -1,8 +1,7 @@
 <html>
   <head>
-    <title>h264-live-player web client demo</title>
+    <title>Video web client demo</title>
     <style>
-
       #video-box {
         background-color: black;
         position: relative;
@@ -10,7 +9,7 @@
         height: 0;
         padding-bottom: calc(100% * 9 / 16);
       }
-      #video-box > canvas{
+      #video-box > canvas {
         position: absolute;
         top: 0;
         left: 0;
@@ -34,65 +33,56 @@
     </style>
   </head>
   <body>
+    <button
+      type="button"
+      onclick="wsavc.send('custom_event_from_client',{ hello:'world' })"
+    >
+      Send event to server
+    </button>
 
-    <button type="button" onclick="wsavc.send('custom_event_from_client',{ hello:'world' })">Send event to server</button>
-    
-    <br/>
-    <p id='frame_buffer'></p>
-    <br/>
+    <br />
+    <p id="frame_buffer"></p>
+    <br />
     <div class="flexbox">
-    <div class="video-aligner">
-      <div id="video-box">
-        <canvas id='cam' >
+      <div class="video-aligner">
+        <div id="video-box">
+          <canvas id="cam"></canvas>
+        </div>
       </div>
     </div>
-  </div>
-    
+    <a href="/audioVideo.html">With audio</a>
 
-  <!-- provide WSAvcPlayer -->
-  <!-- <script type="text/javascript" src="Decoder.js"></script>
-  <script type="text/javascript" src="YUVCanvas.js"></script>
-  <script type="text/javascript" src="Player.js"></script> -->
-    <!-- <script type="text/javascript" src="Decoder.js">;</script> -->
-    <script type="text/javascript" src="WSAvcPlayer.js">;</script>
-    
+    <script type="text/javascript" src="WSAvcPlayer.js"></script>
+
     <script type="text/javascript">
-      var canvas = document.getElementById('cam')
-      var fb = document.getElementById('frame_buffer')
+      var canvas = document.getElementById("cam");
+      var fb = document.getElementById("frame_buffer");
       // Create h264 player
-      var wsavc = new WSAvcPlayer.default({useWorker:true});
-      document.getElementById('video-box').appendChild(wsavc.AvcPlayer.canvas)
-      //expose instance for button callbacks
+      var wsavc = new WSAvcPlayer.default({ useWorker: true });
+      document.getElementById("video-box").appendChild(wsavc.AvcPlayer.canvas);
       window.wsavc = wsavc;
-      
-      //maybe get rid of the ws inside the player?
-      //var uri = "ws://meganeko:3000/videoStream"// + document.location.host;
-      var uri = "ws://" + document.location.host;
-      //var uri = "ws://localhost:3333/"
+      var uri = "ws://" + document.location.host+'/video';
       wsavc.connect(uri);
+      wsavc.on("disconnected", () => console.log("WS Disconnected"));
+      wsavc.on("connected", () => console.log("WS connected"));
+      wsavc.on("frame_shift", fbl => {
+        fb.innerText = "fl: " + fbl;
+      });
 
-      //wsavc.on('message', m=>console.log(m))
-      
-      wsavc.on('disconnected',()=>console.log('WS Disconnected'))
-      wsavc.on('connected',()=>console.log('WS connected'))
-      wsavc.on('frame_shift',(fbl)=>{
-       fb.innerText = 'fl: '+fbl
-      })
-      
+      wsavc.on("resized", payload => {
+        console.log("resized", payload);
+        const vb = document.getElementById("video-box");
 
-      wsavc.on('resized',(payload)=>{
-        console.log('resized', payload)
-        const vb = document.getElementById('video-box')
+        vb.style = `padding-bottom: calc( 100% * ${payload.height} / ${payload.width})`;
+      });
 
-        vb.style = `padding-bottom: calc( 100% * ${payload.height} / ${ payload.width })`
-      })
+      wsavc.on("stream_active", active =>
+        console.log("Stream is ", active ? "active" : "offline")
+      );
 
-      wsavc.on('stream_active',active=>console.log('Stream is ',active?'active':'offline'))
-
-
-      wsavc.on('custom_event_from_server',event=>console.log('got event from server', event))
-
+      wsavc.on("custom_event_from_server", event =>
+        console.log("got event from server", event)
+      );
     </script>
-    
   </body>
 </html>
