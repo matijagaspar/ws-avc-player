@@ -141,7 +141,11 @@ const onButtonClick = ()=>{
 # Notes
 
 ### Audio Video Sync
-Audio support still lacks some important features, mainly there is nothing in this library to get audio and video in sync. Audio and Video are completly separate websocket channels. You could tweak video/audio buffer sizes on server to roughly match the sync and it should work ok in most cases. I might add some sort of muxing later if testing procudes a lot of sync issues.
+Audio support still lacks some important features, mainly there is nothing in this library to get audio and video in sync. Audio and Video are completly separate websocket channels. You could tweak video/audio buffer sizes on server to roughly match the sync and it should work ok in most cases. In the future I plan to add timestamps to audio and video packets to allow sync playback (will require some jitter buffer, meaning larger latency so it will be an optional feature)
+
+### Why 2 WebSockets
+
+The reason for 2 separate WebSockets, one for video and one for audio, is because audio and video have differen "frame rates" or "clock rates", since WS is a reliable channel, that will enforce packet order, using a single WS would make audio-video sync even worse. Any attempt to fix it will require additinal larger buffers.
 
 ### Audio server cpu usage
 Current implemtation of audio decoder on server is syncronous, meaing it blocks the event loop and everything else. I did not encouter major issues yet, but a good practice would be to run the audio server as separate node instance or worker thread. I left this part out because ideally I would like to use Worker Threads but they are still experimental in node 10.
