@@ -88,17 +88,19 @@ PCMPlayer.prototype.destroy = function () {
     this.audioCtx.close()
     this.audioCtx = null
 }
-
+const MAX_DELAY = 0.08
 PCMPlayer.prototype.flush = function () {
     if (!this.samples.length) return
-    let bufferSource = this.audioCtx.createBufferSource(),
-        length = this.samples.length / this.option.channels,
+
+    let length = this.samples.length / this.option.channels,
         audioBuffer = this.audioCtx.createBuffer(this.option.channels, length, this.option.sampleRate),
         audioData,
         channel,
         offset,
         i,
         decrement
+
+    const bufferSource = this.audioCtx.createBufferSource()
 
     for (channel = 0; channel < this.option.channels; channel++) {
         audioData = audioBuffer.getChannelData(channel)
@@ -117,20 +119,22 @@ PCMPlayer.prototype.flush = function () {
             offset += this.option.channels
         }
     }
-
     if (this.startTime < this.audioCtx.currentTime) {
         this.startTime = this.audioCtx.currentTime
     }
     // console.log('start vs current '+this.startTime+' vs '+this.audioCtx.currentTime+' duration: '+audioBuffer.duration);
     bufferSource.buffer = audioBuffer
     bufferSource.connect(this.gainNode)
+    // Crude prevention of lag accumulation, might produce audio some artefacts after connection suddenly resumes. Only works without flushing time set
     bufferSource.start(this.startTime)
     this.startTime += audioBuffer.duration
-    // limit delay?
-    // if ( this.startTime - this.audioCtx.currentTime > 0.4 && this.option.flushingTime) {
-    //     this.startTime = 0
-    // }
-    // console.log(this.startTime - this.audioCtx.currentTime)
+    
+    if ( this.startTime - this.audioCtx.currentTime > MAX_DELAY && !this.option.flushingTime) {
+        // catch up proportinally to the error, so the artificting is reduced
+        this.startTime -= (this.startTime - this.audioCtx.currentTime ) * 0.2
+    }
+
+
     this.samples = new Float32Array()
 }
 

@@ -59,10 +59,12 @@
     </script>
 
     <script type="text/javascript">
-      document.querySelector("button").addEventListener("click", function() {
+      document.getElementById("resumeAudio").addEventListener("click", function() {
         let context = new (window.AudioContext || window.webkitAudioContext)();
         context.resume().then(() => {
           console.log("Playback resumed successfully");
+          wsaaudio.connect(uri);
+          
         });
       });
 
@@ -105,7 +107,7 @@
       var uri = "ws://" + document.location.host + "/audio";
       wsaaudio.on("opus_worker_initialized", () => {
         console.log("worker initialized");
-        wsaaudio.connect(uri);
+        // wsaaudio.connect(uri);
       });
 
       wsaaudio.on("disconnected", () => console.log("WS Disconnected"));

@@ -108,6 +108,7 @@ if (rasp) {
             '-',
         ])
         videoStreamer.on('close', () => {
+            console.log('vs closed')
             videoStreamer = null
         })
         avcServer.setVideoStream(videoStreamer.stdout)
@@ -129,8 +130,13 @@ if (rasp) {
                 console.log('ffmpeg not running')
                 return
             }
-            console.log('stopping raspivid')
-            videoStreamer.kill('SIGTERM')
+            console.log('stopping ffmpeg')
+            videoStreamer.stdin.write('q')
+            setTimeout(() => {
+                if (videoStreamer) {
+                    videoStreamer.kill('SIGTERM')
+                }
+            }, 200)
         }
     })
 
@@ -194,7 +200,7 @@ if (rasp) {
     this.tcpServer.listen(5001, '0.0.0.0')
 }
 
-server.listen(8081)
+server.listen({ port: 8081, host: '0.0.0.0' }, e => console.log(server.address()))
 
 // if not using raspivid option than use one of this to stream
 // ffmpeg OSX

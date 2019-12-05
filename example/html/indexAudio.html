@@ -50,7 +50,7 @@ document.querySelector('button').addEventListener('click', function() {
         let context = new (window.AudioContext || window.webkitAudioContext)();
   context.resume().then(() => {
     console.log('Playback resumed successfully');
-
+    wsaaudio.connect(uri)
   });
 });
 
@@ -63,7 +63,7 @@ document.querySelector('button').addEventListener('click', function() {
       var uri = "ws://" + document.location.host+'/t';
       wsaaudio.on('opus_worker_initialized',()=>{
           console.log('worker initialized')
-          wsaaudio.connect(uri)
+        //   wsaaudio.connect(uri)
         })
       //var uri = "ws://localhost:3333/"
       
