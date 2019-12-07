@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "example": "node example/index.js",
+    "exampleAV": "node example/audioVideoServer.js",
     "build": "cross-env NODE_ENV=production webpack",
     "build:dev": "webpack",
     "lint": "eslint .",
@@ -38,9 +39,13 @@
   "description": "Stream realtime h264 video directly to the browser. Ideal for raspberry pi. Comes with a browser player, and streaming server.\n Based of h264-live-player that uses Broadway Decoder.",
   "dependencies": {
     "debug": "^4.1.1",
+    "exports-loader": "^0.7.0",
+    "null-loader": "^3.0.0",
+    "opusscript": "^0.0.7",
     "stream-split": "^1.1.0",
     "string-replace-loader": "^2.2.0",
-    "sylvester.js": "^0.1.1"
+    "sylvester.js": "^0.1.1",
+    "worker-loader": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",

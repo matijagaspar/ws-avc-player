@@ -1,0 +1,121 @@
+<html>
+  <head>
+    <title>AudioVideo web client demo</title>
+    <style>
+      #video-box {
+        background-color: black;
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: calc(100% * 9 / 16);
+      }
+      #video-box > canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .flexbox {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .video-aligner {
+        width: 70%;
+      }
+
+      @media only screen and (max-width: 800px) {
+        .video-aligner {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button
+      type="button"
+      onclick="wsavc.send('custom_event_from_client',{ hello:'world' })"
+    >
+      Send event to server
+    </button>
+    <button id="resumeAudio">Enable Audio</button>
+    <br />
+    <p id="frame_buffer"></p>
+    <br />
+    <div class="flexbox">
+      <div class="video-aligner">
+        <div id="video-box">
+          <canvas id="cam"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="WSAvcPlayer.js">
+      ;
+    </script>
+    <script type="text/javascript" src="WSAudioPlayer.js">
+      ;
+    </script>
+
+    <script type="text/javascript">
+      document.getElementById("resumeAudio").addEventListener("click", function() {
+        let context = new (window.AudioContext || window.webkitAudioContext)();
+        context.resume().then(() => {
+          console.log("Playback resumed successfully");
+          wsaaudio.connect(uri);
+          
+        });
+      });
+
+      //Prep Video
+      var canvas = document.getElementById("cam");
+      var fb = document.getElementById("frame_buffer");
+      // Create h264 player
+      var wsavc = new WSAvcPlayer.default({ useWorker: true });
+      document.getElementById("video-box").appendChild(wsavc.AvcPlayer.canvas);
+      //expose instance for button callbacks
+      window.wsavc = wsavc;
+      var uri = "ws://" + document.location.host + "/video";
+      wsavc.connect(uri);
+
+      wsavc.on("disconnected", () => console.log("WS Disconnected"));
+      wsavc.on("connected", () => console.log("WS connected"));
+      wsavc.on("frame_shift", fbl => {
+        fb.innerText = "fl: " + fbl;
+      });
+
+      wsavc.on("resized", payload => {
+        console.log("resized", payload);
+        const vb = document.getElementById("video-box");
+        vb.style = `padding-bottom: calc( 100% * ${payload.height} / ${payload.width})`;
+      });
+
+      wsavc.on("stream_active", active =>
+        console.log("Stream is ", active ? "active" : "offline")
+      );
+
+      wsavc.on("custom_event_from_server", event =>
+        console.log("got event from server", event)
+      );
+
+      //Prep audio
+      var wsaaudio = new WSAudioPlayer.default(1, 48000, { flushingTime: 0 });
+      //expose instance for button callbacks
+      window.wsaaudio = wsaaudio;
+
+      var uri = "ws://" + document.location.host + "/audio";
+      wsaaudio.on("opus_worker_initialized", () => {
+        console.log("worker initialized");
+        // wsaaudio.connect(uri);
+      });
+
+      wsaaudio.on("disconnected", () => console.log("WS Disconnected"));
+      wsaaudio.on("connected", () => console.log("WS connected"));
+
+      wsaaudio.on("stream_active", active =>
+        console.log("Stream is ", active ? "active" : "offline")
+      );
+    </script>
+  </body>
+</html>

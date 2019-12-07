@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const AvcServer = require('../lib/server')
+const AvcServer = require('../lib/avcServer')
 const path = require('path')
 const http = require('http')
 // const WebSocketServer = require('uws').Server
@@ -22,7 +22,7 @@ app.use(express.static(path.resolve(__dirname, '../lib')))
 const server = http.createServer(app)
 
 // init web socket
-const wss = new WebSocketServer({ /* port: 3333 */ server })
+const wss = new WebSocketServer({ /* port: 3333 */ server, path: 'video' })
 // init the avc server.
 const avcServer = new AvcServer(wss, width, height)
 
@@ -93,7 +93,7 @@ server.listen(8081)
 // to get video devices run:
 // ffmpeg -list_devices true -f dshow -i dummy
 
-// To get options of the device: 
+// To get options of the device:
 // ffmpeg -f dshow -list_options true -i video="<Device>"
 
 

@@ -1,0 +1,85 @@
+<html>
+  <head>
+    <title>h264-live-player web client demo</title>
+    <style>
+
+      #video-box {
+        background-color: black;
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: calc(100% * 9 / 16);
+      }
+      #video-box > canvas{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .flexbox {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .video-aligner {
+        width: 70%;
+      }
+
+      @media only screen and (max-width: 800px) {
+        .video-aligner {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div>Hello Audio</div>
+    <button>woot</button>
+
+  <!-- provide WSAvcPlayer -->
+  <!-- <script type="text/javascript" src="Decoder.js"></script>
+  <script type="text/javascript" src="YUVCanvas.js"></script>
+  <script type="text/javascript" src="Player.js"></script> -->
+    <!-- <script type="text/javascript" src="Decoder.js">;</script> -->
+    <script type="text/javascript" src="WSAudioPlayer.js">;</script>
+    
+    <script type="text/javascript">
+
+document.querySelector('button').addEventListener('click', function() {
+        let context = new (window.AudioContext || window.webkitAudioContext)();
+  context.resume().then(() => {
+    console.log('Playback resumed successfully');
+    wsaaudio.connect(uri)
+  });
+});
+
+    var wsaaudio = new WSAudioPlayer.default(1, 48000, {flushingTime: 0});
+      //expose instance for button callbacks
+      window.wsaaudio = wsaaudio;
+      
+      //maybe get rid of the ws inside the player?
+      //var uri = "ws://meganeko:3000/videoStream"// + document.location.host;
+      var uri = "ws://" + document.location.host+'/t';
+      wsaaudio.on('opus_worker_initialized',()=>{
+          console.log('worker initialized')
+        //   wsaaudio.connect(uri)
+        })
+      //var uri = "ws://localhost:3333/"
+      
+    //   setTimeout(()=>wsaaudio.connect(uri),5000);
+      
+
+      //wsavc.on('message', m=>console.log(m))
+      
+      wsaaudio.on('disconnected',()=>console.log('WS Disconnected'))
+      wsaaudio.on('connected',()=>console.log('WS connected'))
+      
+      wsaaudio.on('stream_active',active=>console.log('Stream is ',active?'active':'offline'))
+
+      // Create h264 player
+      
+    </script>
+    
+  </body>
+</html>
